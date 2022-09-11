@@ -4,7 +4,7 @@ const util = require("util");
 const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
-const html = require("./src/index.html");
+const html = require("./src/htmlSource");
 
 const writeFileAsync = util.promisify(fs.writeFile);
 const appendFileAsync = util.promisify(fs.appendFile);
@@ -14,7 +14,7 @@ let teamString = ``;
 
 async function main() {
     try {
-        await prompt()
+
 
         for (let i = 0; i < teamArray.length; i++) {
             teamString = teamString + html.generateCard(teamArray[i]);
@@ -31,80 +31,103 @@ async function main() {
 
 async function prompt() {
     let responseDone = "";
-    do {
-        try {
-            let response = await inquirer.prompt([
 
-                {
-                    type: "input",
-                    name: "name",
-                    message: "What is the employee's name?: "
-                },
-                {
-                    type: "input",
-                    name: "id",
-                    message: "Enter the employee's ID: "
-                },
-                {
-                    type: "input",
-                    name: "email",
-                    message: "Enter the employee's email address: "
-                },
-                {
-                    type: "list",
-                    name: "role",
-                    message: "What what is the employee's role:",
-                    choices: [
-                        "Engineer",
-                        "Intern",
-                        "Manager"
-                    ]
-                }
-            ]);
-            let response2 = ""
-            if (response.role === "Engineer") {
-                response2 = await inquirer.prompt([{
-                    type: "input",
-                    name: "x",
-                    message: "What is the employee's github username?:",
-                },]);
-                const engineer = new Engineer(respose.name, response.id, respose.email, response2.x);
-                teamArray.push(engineer);
+    try {
 
-            } else if (response.role === "Intern") {
-                response2 = await inquirer.prompt([{
-                    type: "input",
-                    name: "x",
-                    message: "What school is the employee attending?:",
-                },]);
-                const intern = new Intern(response.name, response.id, response.email, response2.x);
-                teamArray.push(intern);
-            
-            } else if (response.role === "Manager") {
-                response2 = await inquirer.prompt([{
-                    type: "input",
-                    name: "x",
-                    message: "What is the manager office Number?:",
-                },]);
-                const intern = new Manager(response.name, response.id, response.email, response2.x);
-                teamArray.push(manager);
-                }
-            } catch (err) {
-                return console.log(err);
-            }
-        
-            responseDone = await inquirer.prompt([{
+        inquirer.prompt([
+
+            {
+                type: "input",
+                name: "name",
+                message: "What is the employee's name?: "
+            },
+            {
+                type: "input",
+                name: "id",
+                message: "Enter the employee's ID: "
+            },
+            {
+                type: "input",
+                name: "email",
+                message: "Enter the employee's email address: "
+            },
+            {
                 type: "list",
-                name: "finish",
-                message: "Do you want to continue?: ",
+                name: "role",
+                message: "What what is the employee's role:",
                 choices: [
-                    "Yes",
-                    "No"
+                    "Engineer",
+                    "Intern",
+                    "Manager"
                 ]
-            },]);
-        } while (responseDone.finish === "Yes");
+            },
+            {
+                type: "input",
+                name: "github",
+                message: "What is the employee's github username?:",
+                when: response => response.role === "Engineer"
+            },
+
+
+            {
+                type: "input",
+                name: "school",
+                message: "What school is the employee attending?:",
+                when: response => response.role === "Intern"
+            }, {
+                type: "input",
+                name: "officeNumber",
+                message: "What is the manager office Number?:",
+                when: response => response.role === "Manager"
+
+            }
+        ]).then(response => {
+            switch (response.role) {
+                case "Engineer":
+                    const engineer = new Engineer(response.name, response.id, response.email, response.github);
+                    teamArray.push(engineer);
+                    addMoreEmployee();
+                    break;
+                case "Intern":
+                    const intern = new Intern(response.name, response.id, response.email, response.school);
+                    teamArray.push(intern);
+                    addMoreEmployee()
+                    break;
+                case "Manager":
+
+                    const manager = new Manager(response.name, response.id, response.email, response.officeNumber);
+                    teamArray.push(manager);
+                    addMoreEmployee()
+                    break;
+            }
+        })
+
+    } catch (err) {
+        console.log(err);
     }
- 
+}
+
+function addMoreEmployee() {
+    inquirer.prompt([{
+        type: "list",
+        name: "finish",
+        message: "Do you want to continue?: ",
+        choices: [
+            "Yes",
+            "No"
+        ]
+
+    }]).then(res => {
+        switch (res.finish) {
+            case "Yes":
+                prompt();
+                break;
+            case "No":
+                main()
+        }
+    })
+}
+
 //intial program    
-main();
+prompt();
 
