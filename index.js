@@ -21,4 +21,90 @@ async function main() {
         }
 
         let finalHtml = html.generateHTML(teamString)
-    
+        console.log(teamString)
+
+        writeFileAsync("./dist/index.html", finalHtml);
+    } catch (err) {
+        return console.log(err);
+    }
+};
+
+async function prompt() {
+    let responseDone = "";
+    do {
+        try {
+            let response = await inquirer.prompt([
+
+                {
+                    type: "input",
+                    name: "name",
+                    message: "What is the employee's name?: "
+                },
+                {
+                    type: "input",
+                    name: "id",
+                    message: "Enter the employee's ID: "
+                },
+                {
+                    type: "input",
+                    name: "email",
+                    message: "Enter the employee's email address: "
+                },
+                {
+                    type: "list",
+                    name: "role",
+                    message: "What what is the employee's role:",
+                    choices: [
+                        "Engineer",
+                        "Intern",
+                        "Manager"
+                    ]
+                }
+            ]);
+            let response2 = ""
+            if (response.role === "Engineer") {
+                response2 = await inquirer.prompt([{
+                    type: "input",
+                    name: "x",
+                    message: "What is the employee's github username?:",
+                },]);
+                const engineer = new Engineer(respose.name, response.id, respose.email, response2.x);
+                teamArray.push(engineer);
+
+            } else if (response.role === "Intern") {
+                response2 = await inquirer.prompt([{
+                    type: "input",
+                    name: "x",
+                    message: "What school is the employee attending?:",
+                },]);
+                const intern = new Intern(response.name, response.id, response.email, response2.x);
+                teamArray.push(intern);
+            
+            } else if (response.role === "Manager") {
+                response2 = await inquirer.prompt([{
+                    type: "input",
+                    name: "x",
+                    message: "What is the manager office Number?:",
+                },]);
+                const intern = new Manager(response.name, response.id, response.email, response2.x);
+                teamArray.push(manager);
+                }
+            } catch (err) {
+                return console.log(err);
+            }
+        
+            responseDone = await inquirer.prompt([{
+                type: "list",
+                name: "finish",
+                message: "Do you want to continue?: ",
+                choices: [
+                    "Yes",
+                    "No"
+                ]
+            },]);
+        } while (responseDone.finish === "Yes");
+    }
+ 
+//intial program    
+main();
+
