@@ -1,4 +1,3 @@
-const { default: test } = require('node:test');
 const Employee = require('../lib/Employee');
 
 test('makes the employee object', () => {
@@ -27,7 +26,7 @@ test('Set Email', () => {
 test ('Get employee Name', () => {
     const testname = "James"
     const employee = new Employee(testname);
-    expect(employee.getname()).toBe(testname);
+    expect(employee.getName()).toBe(testname);
 });
 
 test ('Get employee ID', () => {
