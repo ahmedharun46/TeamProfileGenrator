@@ -4,7 +4,7 @@ const util = require("util");
 const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
-const html = require("./src/htmlSource");
+const generateHTML = require("./src/htmlSource");
 
 const writeFileAsync = util.promisify(fs.writeFile);
 const appendFileAsync = util.promisify(fs.appendFile);
@@ -17,11 +17,36 @@ async function main() {
 
 
         for (let i = 0; i < teamArray.length; i++) {
-            teamString = teamString + html.generateCard(teamArray[i]);
+            teamString = teamString + `<div class="card" style="width: 18rem;">
+            <div class="card-body"><h5 class="card-title">${teamArray[i].title}</h5>
+              <h5 class="card-title">${teamArray[i].name}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">${teamArray[i].id}</h6>
+              <p class="card-text">${teamArray[i].email}.</p>`
+            if (teamArray[i].title === "Manager") {
+                teamString += `
+             
+                <p class="card-link">${teamArray[i].officeNumber}</p>
+                </div>
+            </div>`
+            }
+            else if (teamArray[i].title === "Engineer") {
+                teamString += `
+           
+                <p class="card-link">${teamArray[i].github}</p>
+            </div>
+            </div>`
+            } else {
+                teamString += `
+             
+                <p class="card-link">${teamArray[i].school}</p>
+            </div>
+            </div>`
+
+            }
         }
 
-        let finalHtml = html.generateHTML(teamString)
-        console.log(teamString)
+        let finalHtml = generateHTML(teamString)
+        console.log(finalHtml)
 
         writeFileAsync("./dist/index.html", finalHtml);
     } catch (err) {
